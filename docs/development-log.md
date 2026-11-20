@@ -72,3 +72,28 @@ Successfully established end-to-end communication between the ESP32 sensor node 
 
 ### Next Milestone
 Develop a Django REST Framework backend to subscribe to MQTT telemetry, process incoming sensor data, and store readings in PostgreSQL.
+
+
+
+
+## Milestone 4: Django Backend and REST API
+
+**Completed work:**
+
+- Created Django backend project.
+- Configured PostgreSQL database.
+- Created Device and SensorReading models.
+- Integrated ESP32 telemetry through MQTT.
+- Implemented MQTT subscriber using Paho MQTT.
+- Stored incoming temperature and humidity readings in PostgreSQL.
+- Configured Django Admin for device and sensor monitoring.
+- Created REST API serializers and views.
+- Implemented device listing and detail endpoints.
+- Implemented sensor reading endpoints with device filtering.
+- Tested API endpoints using Django REST Framework's browsable API.
+
+**Result:**
+
+Successfully established communication between ESP32 hardware, MQTT broker, Django backend, and PostgreSQL database. Sensor data can now be accessed through REST API endpoints.
+
+**Next milestone:** Build the Next.js frontend dashboard.
