@@ -97,3 +97,36 @@ Develop a Django REST Framework backend to subscribe to MQTT telemetry, process 
 Successfully established communication between ESP32 hardware, MQTT broker, Django backend, and PostgreSQL database. Sensor data can now be accessed through REST API endpoints.
 
 **Next milestone:** Build the Next.js frontend dashboard.
+
+
+
+## Milestone 5: Frontend Dashboard Integration
+
+**Status:** Completed
+
+### Implemented
+- Created the Next.js dashboard interface.
+- Integrated the frontend with the Django REST API.
+- Connected device list data to the backend.
+- Connected device and sensor-reading counts to dashboard statistics.
+- Added dynamic online and offline device counts.
+- Displayed registered devices with their IDs, statuses, and last-seen timestamps.
+- Added Devices, Analytics, and Settings pages.
+
+### Current Limitations
+- Live Sensor Data cards still use sample values.
+- Sensor History chart still uses sample data.
+- Temperature and humidity are not yet displayed per device in the device table.
+- Device registration and settings actions are placeholders.
+
+### Technologies
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Recharts
+- Django REST Framework
+
+### Next Step
+Connect actual sensor readings from the backend to the dashboard's live sensor cards, device table, and historical charts.
