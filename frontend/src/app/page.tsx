@@ -42,17 +42,9 @@ import {
   getDevices,
   getSensorReadings,
   type Device,
+  type SensorReading,
 } from "@/lib/api";
 
-// Sample sensor history (will be connected to API later)
-const sensorHistory = [
-  { time: "10:00", temperature: 26, humidity: 60 },
-  { time: "10:10", temperature: 27, humidity: 62 },
-  { time: "10:20", temperature: 28, humidity: 64 },
-  { time: "10:30", temperature: 27, humidity: 63 },
-  { time: "10:40", temperature: 29, humidity: 65 },
-  { time: "10:50", temperature: 29.5, humidity: 65.2 },
-];
 
 const chartConfig = {
   temperature: {
@@ -70,6 +62,11 @@ export default function Home() {
   const [readingCount, setReadingCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  
+  const [latestReadings, setLatestReadings] = useState<
+    Record<number, SensorReading>
+  >({});
+
   // Fetch dashboard data from Django API
   useEffect(() => {
     async function fetchDashboardData() {
@@ -81,6 +78,32 @@ export default function Home() {
 
         setDevices(deviceData);
         setReadingCount(readingData.length);
+
+        // Prepare the latest 20 readings for the history chart
+        const chartData = readingData
+          .slice(0, 20)
+          .reverse()
+          .map((reading) => ({
+            time: new Date(reading.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            temperature: reading.temperature,
+            humidity: reading.humidity,
+          }));
+
+        setSensorHistory(chartData);
+
+        // Get the latest reading for each device
+        const latestByDevice: Record<number, SensorReading> = {};
+
+        for (const reading of readingData) {
+          if (!latestByDevice[reading.device]) {
+            latestByDevice[reading.device] = reading;
+          }
+        }
+
+        setLatestReadings(latestByDevice);
       } catch (error) {
         console.error("Dashboard API error:", error);
       } finally {
@@ -89,6 +112,10 @@ export default function Home() {
     }
 
     fetchDashboardData();
+
+    const interval = setInterval(fetchDashboardData, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Calculate device statistics
@@ -99,6 +126,25 @@ export default function Home() {
   const offlineCount = devices.filter(
     (device) => device.status === "offline"
   ).length;
+
+  const latestReading = Object.values(latestReadings).sort(
+    (a, b) =>
+      new Date(b.timestamp).getTime() -
+      new Date(a.timestamp).getTime()
+  )[0];
+
+  const latestDevice = latestReading
+    ? devices.find((device) => device.id === latestReading.device)
+    : null;
+
+
+  const [sensorHistory, setSensorHistory] = useState<
+  {
+      time: string;
+      temperature: number;
+      humidity: number;
+    }[]
+  >([]);
 
   // Dashboard statistics
   const stats = [
@@ -127,6 +173,7 @@ export default function Home() {
       icon: Activity,
     },
   ];
+
 
   return (
     <DashboardLayout>
@@ -192,12 +239,16 @@ export default function Home() {
                 </p>
 
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">29.5</span>
+                  <span className="text-3xl font-bold">
+                    {latestReading
+                      ? latestReading.temperature.toFixed(1)
+                      : "—"}
+                  </span>
                   <span className="text-sm text-gray-500">°C</span>
                 </div>
 
                 <p className="mt-1 text-xs text-gray-500">
-                  Device: esp32_001
+                  Device: {latestDevice?.device_id ?? "No data"}
                 </p>
               </div>
 
@@ -215,12 +266,16 @@ export default function Home() {
                 </p>
 
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">65.2</span>
+                  <span className="text-3xl font-bold">
+                    {latestReading
+                      ? latestReading.humidity.toFixed(1)
+                      : "—"}
+                  </span>
                   <span className="text-sm text-gray-500">%</span>
                 </div>
 
-                <p className="mt-1 text-xs text-gray-500">
-                  Device: esp32_001
+                 <p className="mt-1 text-xs text-gray-500">
+                  Device: {latestDevice?.device_id ?? "No data"}
                 </p>
               </div>
 
@@ -367,9 +422,17 @@ export default function Home() {
                         </Badge>
                       </TableCell>
 
-                      <TableCell>—</TableCell>
+                      <TableCell>
+                        {latestReadings[device.id]
+                          ? `${latestReadings[device.id].temperature.toFixed(1)} °C`
+                          : "—"}
+                      </TableCell>
 
-                      <TableCell>—</TableCell>
+                      <TableCell>
+                        {latestReadings[device.id]
+                          ? `${latestReadings[device.id].humidity.toFixed(1)} %`
+                          : "—"}
+                      </TableCell>
 
                       <TableCell className="text-gray-500">
                         {device.last_seen

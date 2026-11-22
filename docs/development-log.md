@@ -130,3 +130,29 @@ Successfully established communication between ESP32 hardware, MQTT broker, Djan
 
 ### Next Step
 Connect actual sensor readings from the backend to the dashboard's live sensor cards, device table, and historical charts.
+
+## Milestone 6: Real-Time Sensor Dashboard
+
+**Status:** Completed
+
+### Implemented
+- Connected device temperature and humidity values to actual sensor readings.
+- Displayed the latest sensor readings in dashboard cards.
+- Replaced sample chart data with actual database readings.
+- Displayed the latest 20 sensor readings in the history chart.
+- Implemented automatic dashboard data refresh every 5 seconds.
+
+### Data Flow
+ESP32 → MQTT → Django Backend → PostgreSQL → REST API → Next.js Dashboard
+
+### Technologies
+- Next.js
+- React
+- TypeScript
+- Django REST Framework
+- PostgreSQL
+- MQTT
+- Recharts
+
+### Result
+The dashboard now displays actual sensor data collected from the ESP32 and updates automatically.
